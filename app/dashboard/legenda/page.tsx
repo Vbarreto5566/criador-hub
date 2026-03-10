@@ -110,7 +110,7 @@ export default function LegendaPage() {
           <label style={fl}>Opções extras</label>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' as const }}>
             {[['hashtags','# Hashtags',hashtags,setHashtags],['emojis','😊 Emojis',emojis,setEmojis]].map(([id,lbl,val,setter]) => (
-              <label key={id as string} style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontSize: 13, color: '#6b6b8a' }} onClick={() => (setter as any)(v => !v)}>
+              <label key={id as string} style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontSize: 13, color: '#6b6b8a' }} onClick={() => (setter as any)((v: boolean) => !v)}>
                 <div style={{ width: 18, height: 18, borderRadius: 5, border: `1.5px solid ${val ? '#7c3aff' : 'rgba(255,255,255,.07)'}`, background: val ? '#7c3aff' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .2s' }}>
                   {val && <span style={{ color: '#fff', fontSize: 11 }}>✓</span>}
                 </div>
