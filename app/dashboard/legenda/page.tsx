@@ -109,14 +109,18 @@ export default function LegendaPage() {
         <div style={fg}>
           <label style={fl}>Opções extras</label>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' as const }}>
-            {[['hashtags','# Hashtags',hashtags,setHashtags],['emojis','😊 Emojis',emojis,setEmojis]].map(([id,lbl,val,setter]) => (
-              <label key={id as string} style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontSize: 13, color: '#6b6b8a' }} onClick={() => (setter as any)((v: boolean) => !v)}>
-                <div style={{ width: 18, height: 18, borderRadius: 5, border: `1.5px solid ${val ? '#7c3aff' : 'rgba(255,255,255,.07)'}`, background: val ? '#7c3aff' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .2s' }}>
-                  {val && <span style={{ color: '#fff', fontSize: 11 }}>✓</span>}
-                </div>
-                {lbl}
-              </label>
-            ))}
+            <label style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontSize: 13, color: '#6b6b8a' }} onClick={() => setHashtags(v => !v)}>
+              <div style={{ width: 18, height: 18, borderRadius: 5, border: `1.5px solid ${hashtags ? '#7c3aff' : 'rgba(255,255,255,.07)'}`, background: hashtags ? '#7c3aff' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .2s' }}>
+                {hashtags && <span style={{ color: '#fff', fontSize: 11 }}>✓</span>}
+              </div>
+              # Hashtags
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontSize: 13, color: '#6b6b8a' }} onClick={() => setEmojis(v => !v)}>
+              <div style={{ width: 18, height: 18, borderRadius: 5, border: `1.5px solid ${emojis ? '#7c3aff' : 'rgba(255,255,255,.07)'}`, background: emojis ? '#7c3aff' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .2s' }}>
+                {emojis && <span style={{ color: '#fff', fontSize: 11 }}>✓</span>}
+              </div>
+              😊 Emojis
+            </label>
           </div>
         </div>
 
