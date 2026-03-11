@@ -59,7 +59,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     router.replace('/auth')
   }
 
-  const nb: CSSProperties = { width:46, height:34, borderRadius:6, border:'none', background:'transparent', cursor:'pointer', color:'var(--t3)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14, transition:'all .12s', fontFamily:'var(--mono)', textDecoration:'none', width:'calc(100% - 8px)', margin:'0 4px', padding:'0 8px', gap:8, justifyContent:'flex-start' }
+  const nb: CSSProperties = { width:'calc(100% - 8px)', height:34, borderRadius:6, border:'none', background:'transparent', cursor:'pointer', color:'var(--t3)', display:'flex', alignItems:'center', justifyContent:'flex-start', fontSize:14, transition:'all .12s', fontFamily:'var(--mono)', textDecoration:'none', margin:'0 4px', padding:'0 8px', gap:8 }
 
   return (
     <div style={{ display:'flex', minHeight:'100vh' }}>
