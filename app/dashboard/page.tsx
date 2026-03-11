@@ -1,69 +1,104 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 
-export default function ProfilePage() {
+const card = { background:'var(--s1)', border:'1px solid var(--b1)', borderRadius:10, padding:18 }
+const secTitle = { fontFamily:'var(--mono)', fontSize:10, color:'var(--t3)', letterSpacing:'.08em', textTransform:'uppercase' as const, marginBottom:12 }
+
+export default function DashboardPage() {
+  const router = useRouter()
   const [user, setUser] = useState<any>(null)
+  useEffect(() => { createClient().auth.getUser().then(({data})=>setUser(data.user)) }, [])
 
-  useEffect(() => {
-    createClient().auth.getUser().then(({ data }) => setUser(data.user))
-  }, [])
+  const name  = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Creator'
+  const niche = user?.user_metadata?.niche || 'Creator'
+  const since = user?.created_at ? new Date(user.created_at).toLocaleDateString('pt-BR',{month:'short',year:'numeric'}) : '—'
 
-  const name     = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Creator'
-  const niche    = user?.user_metadata?.niche || 'Creator'
-  const initials = name.trim().split(' ').map((w: string) => w[0]).join('').slice(0,2).toUpperCase()
-  const since    = user?.created_at ? new Date(user.created_at).toLocaleDateString('pt-BR', { day:'numeric', month:'long', year:'numeric' }) : '—'
-
-  const card = { background: '#0f0f1a', border: '1px solid rgba(255,255,255,.07)', borderRadius: 14, padding: 20 }
+  const sched = [
+    {time:'09:00',pl:'ig',title:'Reels — Rotina matinal',cap:'5 hábitos que mudaram minha vida',st:'sc'},
+    {time:'12:30',pl:'tt',title:'TikTok — Treino rápido',cap:'15min sem equipamento',st:'lv'},
+    {time:'18:00',pl:'ig',title:'Stories — Bastidores',cap:'Nos bastidores da parceria',st:'dr'},
+  ]
+  const stMap: Record<string,{label:string,color:string,bg:string}> = {
+    sc:{label:'agendado',color:'#6b6760',bg:'rgba(107,103,96,.12)'},
+    lv:{label:'ao vivo', color:'#5a7a5a',bg:'rgba(90,122,90,.12)'},
+    dr:{label:'rascunho',color:'#5a5a4a',bg:'rgba(90,90,74,.1)'},
+  }
 
   return (
-    <div className="anim-fadeup">
-      {/* HERO */}
-      <div style={{ ...card, position: 'relative', overflow: 'hidden', marginBottom: 16 }}>
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 72, background: 'linear-gradient(135deg,rgba(255,59,107,.12),rgba(124,58,255,.12))' }} />
-        <div style={{ width: 74, height: 74, borderRadius: '50%', background: 'linear-gradient(135deg,#ff3b6b,#7c3aff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Syne,sans-serif', fontWeight: 800, fontSize: 26, color: '#fff', position: 'relative', zIndex: 1, border: '3px solid #07070f', boxShadow: '0 4px 20px rgba(255,59,107,.4)' }}>{initials}</div>
-        <div style={{ fontFamily: 'Syne,sans-serif', fontSize: 20, fontWeight: 700, marginTop: 8, position: 'relative', zIndex: 1 }}>{name}</div>
-        <div style={{ color: '#6b6b8a', fontSize: 13, marginTop: 3, position: 'relative', zIndex: 1 }}>{user?.email}</div>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 11px', borderRadius: 20, fontSize: 11, background: 'rgba(0,229,195,.1)', color: '#00e5c3', border: '1px solid rgba(0,229,195,.2)', marginTop: 9, position: 'relative', zIndex: 1 }}>✓ Conta ativa · {niche}</div>
+    <div className="anim-fade">
+      {/* Heading */}
+      <div style={{ marginBottom:32 }}>
+        <h1 style={{ fontFamily:'var(--serif)', fontSize:30, fontStyle:'italic', letterSpacing:'-0.02em', marginBottom:6 }}>
+          Olá, {name.split(' ')[0]}
+        </h1>
+        <p style={{ fontSize:13, color:'var(--t3)' }}>
+          {new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}
+        </p>
       </div>
 
-      {/* STATS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 16 }}>
-        {[['Seguidores','—','Conecte suas redes'],['Engajamento','—','Conecte suas redes'],['Posts agendados','0','Nenhum agendado']].map(([l,v,c]) => (
-          <div key={l} style={{ ...card }}>
-            <div style={{ fontSize: 11, color: '#6b6b8a', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>{l}</div>
-            <div style={{ fontFamily: 'Syne,sans-serif', fontSize: 24, fontWeight: 800 }}>{v}</div>
-            <div style={{ fontSize: 11, color: '#6b6b8a', marginTop: 3 }}>{c}</div>
+      {/* Stats */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:10, marginBottom:20 }}>
+        {[['Seguidores','—','conecte suas redes'],['Engajamento','—','conecte suas redes'],['Posts agendados','3','próximos 7 dias'],['Propostas','5','marcas ativas']].map(([l,v,d])=>(
+          <div key={l} style={card}>
+            <div style={{ fontFamily:'var(--mono)', fontSize:10, color:'var(--t3)', letterSpacing:'.07em', textTransform:'uppercase', marginBottom:8 }}>{l}</div>
+            <div style={{ fontFamily:'var(--serif)', fontSize:26, fontStyle:'italic', color:'var(--t1)', letterSpacing:'-0.03em' }}>{v}</div>
+            <div style={{ fontSize:11, color:'var(--t3)', marginTop:4, fontFamily:'var(--mono)' }}>{d}</div>
           </div>
         ))}
       </div>
 
-      {/* CONNECT SOCIAL */}
-      <div style={{ ...card, marginBottom: 16 }}>
-        <div style={{ fontFamily: 'Syne,sans-serif', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.07em', color: '#6b6b8a', marginBottom: 13, display: 'flex', alignItems: 'center', gap: 7 }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ff3b6b', display: 'inline-block' }} />Conectar Redes Sociais
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
+        {/* Schedule */}
+        <div style={card}>
+          <div style={secTitle}>Hoje</div>
+          {sched.map((s,i)=>{
+            const status = stMap[s.st]
+            return (
+              <div key={i} style={{ display:'flex', alignItems:'center', gap:12, padding:'8px 10px', borderRadius:5, cursor:'pointer', transition:'background .1s' }}
+                onMouseEnter={e=>(e.currentTarget.style.background='var(--s2)')}
+                onMouseLeave={e=>(e.currentTarget.style.background='transparent')}>
+                <span style={{ fontFamily:'var(--mono)', fontSize:11, color:'var(--t3)', minWidth:38 }}>{s.time}</span>
+                <span style={{ width:5, height:5, borderRadius:'50%', background:s.pl==='ig'?'var(--t3)':'var(--t4)', flexShrink:0 }}/>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:13 }}>{s.title}</div>
+                  <div style={{ fontSize:11, color:'var(--t3)' }}>{s.cap}</div>
+                </div>
+                <span style={{ padding:'2px 7px', borderRadius:4, fontSize:10, fontFamily:'var(--mono)', background:status.bg, color:status.color }}>{status.label}</span>
+              </div>
+            )
+          })}
         </div>
-        {[['📸','Instagram','#e6683c','rgba(230,104,60,.1)'],['🎵','TikTok','#ff004f','rgba(255,0,79,.1)']].map(([ico,nm,col,bg]) => (
-          <div key={nm as string} style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '13px 15px', background: '#161625', border: '1px solid rgba(255,255,255,.07)', borderRadius: 11, marginBottom: 9 }}>
-            <span style={{ fontSize: 22 }}>{ico}</span>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 600 }}>{nm}</div>
-              <div style={{ fontSize: 12, color: '#6b6b8a' }}>Conecte via API oficial do {nm}</div>
+
+        {/* Quick actions */}
+        <div style={card}>
+          <div style={secTitle}>Início rápido</div>
+          {[
+            {icon:'✦',label:'Gerar uma legenda',href:'/dashboard/legenda'},
+            {icon:'◎',label:'Explorar criadores',href:'/dashboard/creators'},
+            {icon:'◇',label:'Ver propostas de marca',href:'/dashboard/brands'},
+            {icon:'▦',label:'Agendar conteúdo',href:'/dashboard/schedule'},
+          ].map((item,i)=>(
+            <div key={i} style={{ display:'flex', alignItems:'center', gap:10, padding:'9px 10px', borderRadius:5, cursor:'pointer', transition:'background .1s' }}
+              onClick={()=>router.push(item.href)}
+              onMouseEnter={e=>(e.currentTarget.style.background='var(--s2)')}
+              onMouseLeave={e=>(e.currentTarget.style.background='transparent')}>
+              <div style={{ width:28, height:28, borderRadius:5, background:'var(--s3)', border:'1px solid var(--b1)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, color:'var(--t3)', fontFamily:'var(--mono)', flexShrink:0 }}>{item.icon}</div>
+              <span style={{ fontSize:13, flex:1 }}>{item.label}</span>
+              <span style={{ color:'var(--t4)', fontSize:12 }}>→</span>
             </div>
-            <button style={{ padding: '7px 14px', borderRadius: 8, border: `1px solid ${col}66`, background: bg as string, color: col as string, cursor: 'pointer', fontSize: 12 }}>Conectar</button>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* ACCOUNT INFO */}
-      <div style={card}>
-        <div style={{ fontFamily: 'Syne,sans-serif', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.07em', color: '#6b6b8a', marginBottom: 13, display: 'flex', alignItems: 'center', gap: 7 }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ff3b6b', display: 'inline-block' }} />Informações da Conta
-        </div>
-        {[['Email', user?.email || '—'],['Nicho', niche],['Membro desde', since],['ID da conta', (user?.id || '').slice(0,12) + '...']].map(([l,v]) => (
-          <div key={l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 0', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
-            <span style={{ fontSize: 13, color: '#6b6b8a' }}>{l}</span>
-            <span style={{ fontSize: 13, fontWeight: 500 }}>{v}</span>
+      {/* Profile info */}
+      <div style={{ ...card, marginTop:14 }}>
+        <div style={secTitle}>Conta</div>
+        {[['Email',user?.email||'—'],['Nicho',niche],['Membro desde',since]].map(([l,v])=>(
+          <div key={l} style={{ display:'flex', justifyContent:'space-between', padding:'8px 0', borderBottom:'1px solid var(--b1)' }}>
+            <span style={{ fontSize:13, color:'var(--t3)' }}>{l}</span>
+            <span style={{ fontSize:13 }}>{v}</span>
           </div>
         ))}
       </div>
