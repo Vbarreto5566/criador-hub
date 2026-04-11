@@ -1,0 +1,10 @@
+{
+  "projectId": "prj_E0d6qy0cqcvpZDYriokfQWzGeUsv",
+  "orgId": "team_kHSs4b6AIh6rsAhLSRR0jjNZ",
+  "settings": {
+    "framework": "vite",
+    "buildCommand": "npm run build",
+    "outputDirectory": "dist",
+    "installCommand": "npm install"
+  }
+}
