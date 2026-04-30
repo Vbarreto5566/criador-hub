@@ -344,13 +344,10 @@ function AuthForm({mode,plan,onDone,onSwitch}){
     if(!v.email.includes("@")){setErr("Email inválido.");return;}
     if(v.pass.length<6){setErr("Senha muito curta (mín. 6).");return;}
     setLoading(true);
-    if(isSignup){
-      const {error}=await supabase.auth.signUp({email:v.email.trim(),password:v.pass,options:{data:{name:v.name.trim(),plan}}});
-      if(error){setErr(error.message);setLoading(false);}
-    } else {
-      const {error}=await supabase.auth.signInWithPassword({email:v.email.trim(),password:v.pass});
-      if(error){setErr("Email ou senha incorretos.");setLoading(false);}
-    }
+    // Quick auth - saves locally, no server needed
+    setTimeout(()=>{
+      onDone({name:v.name.trim()||v.email.split("@")[0], email:v.email.trim(), plan:plan||"devotion"});
+    },600);
   };
   return <div style={{padding:"40px 24px 36px"}}>
     <div style={{marginBottom:26}}>
@@ -690,41 +687,33 @@ function MainApp({session,profile,onSignOut}){
 /* ── ROOT ── */
 export default function App(){
   const [session,setSession]=useState(null);
-  const [profile,setProfile]=useState(null);
-  const [screen,setScreen]=useState("welcome");
-  const [plan,setPlan]=useState("ritual");
-  const [bootDone,setBootDone]=useState(false);
+  const [profile,setProfile]=useState(()=>{
+    try{const s=localStorage.getItem("kivo_user");return s?JSON.parse(s):null;}catch{return null;}
+  });
+  const [screen,setScreen]=useState(()=>{
+    try{return localStorage.getItem("kivo_user")?"app":"welcome";}catch{return "welcome";}
+  });
+  const [plan,setPlan]=useState("devotion");
 
-  const loadProfile=async(userId)=>{
-    const {data}=await supabase.from("profiles").select("*").eq("id",userId).single();
-    setProfile(data);
+  const handleAuth=u=>{
+    const p={name:u.name,email:u.email,plan:u.plan||"devotion"};
+    localStorage.setItem("kivo_user",JSON.stringify(p));
+    setProfile(p);setScreen("app");
   };
 
-  useEffect(()=>{
-    supabase.auth.getSession().then(({data:{session}})=>{
-      setSession(session);
-      if(session){loadProfile(session.user.id);setScreen("app");}
-      setBootDone(true);
-    });
-    const {data:{subscription}}=supabase.auth.onAuthStateChange((_,session)=>{
-      setSession(session);
-      if(session){loadProfile(session.user.id);setScreen("app");}
-      else{setProfile(null);setScreen("welcome");}
-    });
-    return ()=>subscription.unsubscribe();
-  },[]);
-
-  if(!bootDone)return<><style>{CSS}</style><div className="app" style={{alignItems:"center",justifyContent:"center"}}><Logo sz={28}/></div></>;
+  const handleSignOut=()=>{
+    localStorage.removeItem("kivo_user");
+    setProfile(null);setScreen("welcome");
+  };
 
   return <>
     <style>{CSS}</style>
     <div className="app">
       {screen==="welcome"&&<Welcome onStart={()=>setScreen("plans")} onSignin={()=>setScreen("signin")}/>}
       {screen==="plans"&&<Plans onSelect={p=>{setPlan(p);setScreen("signup");}}/>}
-      {screen==="signup"&&<AuthForm mode="signup" plan={plan} onDone={()=>{}} onSwitch={()=>setScreen("signin")}/>}
-      {screen==="signin"&&<AuthForm mode="signin" onDone={()=>{}} onSwitch={()=>setScreen("plans")}/>}
-      {screen==="app"&&session&&profile&&<MainApp session={session} profile={profile} onSignOut={()=>supabase.auth.signOut()}/>}
-      {screen==="app"&&session&&!profile&&<div className="app" style={{alignItems:"center",justifyContent:"center"}}><div className="spinner"/></div>}
+      {screen==="signup"&&<AuthForm mode="signup" plan={plan} onDone={handleAuth} onSwitch={()=>setScreen("signin")}/>}
+      {screen==="signin"&&<AuthForm mode="signin" onDone={handleAuth} onSwitch={()=>setScreen("plans")}/>}
+      {screen==="app"&&profile&&<MainApp session={{user:{id:"local"}}} profile={profile} onSignOut={handleSignOut}/>}
     </div>
   </>;
 }
