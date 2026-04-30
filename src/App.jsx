@@ -296,7 +296,7 @@ function Welcome({onStart,onSignin}){
 
 /* ── Plans ── */
 function Plans({onSelect}){
-  const [sel,setSel]=useState("ritual");
+  const [sel,setSel]=useState("devotion");
   const [billing,setBilling]=useState("monthly");
   return <div className="scrl" style={{padding:"36px 20px 36px"}}>
     <div style={{marginBottom:22}}>
@@ -390,7 +390,7 @@ function MainApp({session,profile,onSignOut}){
   const [toast,setToast]=useState(null);
   const endRef=useRef(null);
 
-  const plan=profile?.plan||"seed";
+  const plan=profile?.plan||"devotion";
   const canCoach=plan==="ritual"||plan==="devotion";
   const canInsight=plan==="devotion";
   const done=habits.filter(h=>h.done).length;
