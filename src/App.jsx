@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { supabase } from "./lib/supabase.js";
 
 /* ── NOTIFICATION QUOTES ── */
 const QUOTES = [
@@ -686,7 +685,6 @@ function MainApp({session,profile,onSignOut}){
 
 /* ── ROOT ── */
 export default function App(){
-  const [session,setSession]=useState(null);
   const [profile,setProfile]=useState(()=>{
     try{const s=localStorage.getItem("kivo_user");return s?JSON.parse(s):null;}catch{return null;}
   });
